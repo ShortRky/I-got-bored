@@ -1,0 +1,39 @@
+{
+  "names": {
+    "yourName": "Your Name",
+    "partnerName": "Partner's Name"
+  },
+  "colors": {
+    "primary": "#ff6b9d",
+    "secondary": "#c44569",
+    "accent": "#ffd93d",
+    "background": "#0a0a0f",
+    "text": "#ffffff"
+  },
+  "fonts": {
+    "heading": "Playfair Display",
+    "body": "Inter"
+  },
+  "messages": [
+    { "section": "hero", "text": "For [Partner's Name], with love" },
+    { "section": "heart", "text": "You hold my heart" },
+    { "section": "memories", "text": "Every moment with you is a treasure" },
+    { "section": "declaration", "text": "I love you more than words can say" },
+    { "section": "finale", "text": "Forever yours" }
+  ],
+  "photos": [
+    { "url": "/photos/photo1.jpg", "caption": "Our first photo together" },
+    { "url": "/photos/photo2.jpg", "caption": "A favorite memory" },
+    { "url": "/photos/photo3.jpg", "caption": "I love you" }
+  ],
+  "music": {
+    "url": "/music/song.mp3",
+    "autoPlay": false,
+    "title": "Our Song"
+  },
+  "timing": {
+    "scrollSpeed": 1.0,
+    "particleCount": 2000,
+    "animationDuration": 1.5
+  }
+}
