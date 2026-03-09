@@ -117,16 +117,23 @@ function CentralCrystal() {
 export default function FinaleSection({ scrollProgress }: FinaleSectionProps) {
   const groupRef = useRef<THREE.Group>(null)
   
+  // Show between scroll 0.75 and 1.0
+  let opacity = 0
+  if (scrollProgress > 0.75 && scrollProgress < 1.0) {
+    const progress = (scrollProgress - 0.75) / 0.25
+    opacity = Math.sin(progress * Math.PI)
+  } else if (scrollProgress >= 1.0) {
+    opacity = 1
+  }
+  
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = scrollProgress * Math.PI * 2
-      const breathe = 1 + Math.sin(state.clock.elapsedTime) * 0.05
-      groupRef.current.scale.setScalar(breathe)
     }
   })
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={opacity}>
       <RadiatingRings />
       <Sparkles />
       <CentralCrystal />

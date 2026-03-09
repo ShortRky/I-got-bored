@@ -95,6 +95,15 @@ function ParticleField() {
 export default function MemoriesSection({ scrollProgress }: MemoriesSectionProps) {
   const groupRef = useRef<THREE.Group>(null)
   
+  // Show between scroll 0.35 and 0.55
+  let opacity = 0
+  if (scrollProgress > 0.35 && scrollProgress < 0.55) {
+    const progress = (scrollProgress - 0.35) / 0.2
+    opacity = Math.sin(progress * Math.PI)
+  } else if (scrollProgress >= 0.55) {
+    opacity = Math.max(0, 1 - (scrollProgress - 0.55) * 5)
+  }
+  
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y = scrollProgress * Math.PI * 0.5
@@ -102,7 +111,7 @@ export default function MemoriesSection({ scrollProgress }: MemoriesSectionProps
   })
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={opacity}>
       <FloatingShapes />
       <ParticleField />
     </group>

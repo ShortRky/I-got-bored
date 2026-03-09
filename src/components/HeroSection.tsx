@@ -38,7 +38,6 @@ function Particles({ count = 2000 }) {
     }
   })
 
-  // Use points primitive
   return (
     <points ref={points}>
       <bufferGeometry>
@@ -72,15 +71,17 @@ export default function HeroSection({ scrollProgress }: HeroSectionProps) {
   const { config } = useConfig()
   const groupRef = useRef<THREE.Group>(null)
   
+  // Show in first 20% of scroll
+  const opacity = scrollProgress < 0.2 ? 1 : Math.max(0, 1 - (scrollProgress - 0.2) * 5)
+  
   useFrame(() => {
     if (groupRef.current) {
       groupRef.current.rotation.y = Math.sin(scrollProgress * Math.PI * 2) * 0.2
-      groupRef.current.position.z = Math.sin(scrollProgress * Math.PI) * 0.5
     }
   })
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={opacity}>
       <Particles count={config.timing.particleCount} />
       <mesh position={[0, 0, 0]}>
         <torusKnotGeometry args={[0.8, 0.3, 100, 16]} />

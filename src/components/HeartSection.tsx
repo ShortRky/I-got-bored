@@ -8,7 +8,7 @@ interface HeartSectionProps {
 }
 
 // Heart-shaped particle system
-function HeartParticles({ count = 1000, scrollProgress }: { count?: number, scrollProgress: number }) {
+function HeartParticles({ count = 1000 }: { count?: number }) {
   const { config } = useConfig()
   const points = useRef<THREE.Points>(null)
   
@@ -17,7 +17,7 @@ function HeartParticles({ count = 1000, scrollProgress }: { count?: number, scro
     const colors = new Float32Array(count * 3)
     const color = new THREE.Color(config.colors.primary)
     
-    // Create heart shape
+    // Create heart shape using parametric equations
     for (let i = 0; i < count; i++) {
       const t = (i / count) * Math.PI * 2
       const x = 16 * Math.pow(Math.sin(t), 3)
@@ -35,14 +35,6 @@ function HeartParticles({ count = 1000, scrollProgress }: { count?: number, scro
     
     return { positions, colors }
   }, [count, config.colors.primary])
-
-  useFrame((state) => {
-    if (points.current) {
-      const scale = 1 + Math.sin(state.clock.elapsedTime) * 0.1
-      points.current.scale.set(scale, scale, scale)
-      points.current.rotation.z = scrollProgress * Math.PI
-    }
-  })
 
   return (
     <points ref={points}>
@@ -76,16 +68,12 @@ function HeartParticles({ count = 1000, scrollProgress }: { count?: number, scro
 function MorphingHeart() {
   const { config } = useConfig()
   const meshRef = useRef<THREE.Mesh>(null)
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null)
   
   useFrame((state) => {
     if (meshRef.current) {
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
+      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.1
       meshRef.current.scale.setScalar(pulse)
       meshRef.current.rotation.y = state.clock.elapsedTime * 0.5
-    }
-    if (materialRef.current) {
-      materialRef.current.emissiveIntensity = 0.3 + Math.sin(state.clock.elapsedTime) * 0.2
     }
   })
 
@@ -93,7 +81,6 @@ function MorphingHeart() {
     <mesh ref={meshRef}>
       <icosahedronGeometry args={[1.5, 2]} />
       <meshStandardMaterial 
-        ref={materialRef}
         color={config.colors.primary}
         emissive={config.colors.secondary}
         emissiveIntensity={0.5}
@@ -105,10 +92,26 @@ function MorphingHeart() {
 
 export default function HeartSection({ scrollProgress }: HeartSectionProps) {
   const { config } = useConfig()
+  const groupRef = useRef<THREE.Group>(null)
   
+  // Show between scroll 0.15 and 0.35
+  let opacity = 0
+  if (scrollProgress > 0.15 && scrollProgress < 0.35) {
+    const progress = (scrollProgress - 0.15) / 0.2
+    opacity = Math.sin(progress * Math.PI)
+  } else if (scrollProgress >= 0.35) {
+    opacity = Math.max(0, 1 - (scrollProgress - 0.35) * 5)
+  }
+  
+  useFrame((state) => {
+    if (groupRef.current) {
+      groupRef.current.rotation.y = state.clock.elapsedTime * 0.1
+    }
+  })
+
   return (
-    <group position={[0, 0, 0]}>
-      <HeartParticles count={1500} scrollProgress={scrollProgress} />
+    <group ref={groupRef} scale={opacity}>
+      <HeartParticles count={1500} />
       <MorphingHeart />
       <pointLight color={config.colors.primary} intensity={2} distance={10} />
     </group>

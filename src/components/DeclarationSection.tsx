@@ -7,7 +7,7 @@ interface DeclarationSectionProps {
 }
 
 // Explosion of particles
-function ParticleExplosion({ scrollProgress }: { scrollProgress: number }) {
+function ParticleExplosion() {
   const points = useRef<THREE.Points>(null)
   
   const count = 3000
@@ -32,11 +32,11 @@ function ParticleExplosion({ scrollProgress }: { scrollProgress: number }) {
       
       const colorChoice = Math.random()
       if (colorChoice < 0.33) {
-        colors[i3] = 1; colors[i3 + 1] = 0.42; colors[i3 + 2] = 0.62 // primary
+        colors[i3] = 1; colors[i3 + 1] = 0.42; colors[i3 + 2] = 0.62
       } else if (colorChoice < 0.66) {
-        colors[i3] = 0.77; colors[i3 + 1] = 0.27; colors[i3 + 2] = 0.41 // secondary
+        colors[i3] = 0.77; colors[i3 + 1] = 0.27; colors[i3 + 2] = 0.41
       } else {
-        colors[i3] = 1; colors[i3 + 1] = 0.85; colors[i3 + 2] = 0.24 // accent
+        colors[i3] = 1; colors[i3 + 1] = 0.85; colors[i3 + 2] = 0.24
       }
     }
     
@@ -49,11 +49,10 @@ function ParticleExplosion({ scrollProgress }: { scrollProgress: number }) {
       
       for (let i = 0; i < count; i++) {
         const i3 = i * 3
-        positions[i3] += particles.velocities[i3] * (1 + scrollProgress * 2)
-        positions[i3 + 1] += particles.velocities[i3 + 1] * (1 + scrollProgress * 2)
-        positions[i3 + 2] += particles.velocities[i3 + 2] * (1 + scrollProgress * 2)
+        positions[i3] += particles.velocities[i3]
+        positions[i3 + 1] += particles.velocities[i3 + 1]
+        positions[i3 + 2] += particles.velocities[i3 + 2]
         
-        // Reset particles that go too far
         const dist = Math.sqrt(
           positions[i3] ** 2 + 
           positions[i3 + 1] ** 2 + 
@@ -128,17 +127,24 @@ function GlowingOrb() {
 export default function DeclarationSection({ scrollProgress }: DeclarationSectionProps) {
   const groupRef = useRef<THREE.Group>(null)
   
+  // Show between scroll 0.55 and 0.75
+  let opacity = 0
+  if (scrollProgress > 0.55 && scrollProgress < 0.75) {
+    const progress = (scrollProgress - 0.55) / 0.2
+    opacity = Math.sin(progress * Math.PI)
+  } else if (scrollProgress >= 0.75) {
+    opacity = Math.max(0, 1 - (scrollProgress - 0.75) * 5)
+  }
+  
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.elapsedTime * 0.1
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.05
-      groupRef.current.scale.setScalar(pulse + scrollProgress * 0.5)
     }
   })
 
   return (
-    <group ref={groupRef}>
-      <ParticleExplosion scrollProgress={scrollProgress} />
+    <group ref={groupRef} scale={opacity}>
+      <ParticleExplosion />
       <GlowingOrb />
       <pointLight color="#ff6b9d" intensity={3} distance={15} />
     </group>
